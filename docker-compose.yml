@@ -1,12 +1,12 @@
 mongodb:
-  image: 'tutum/mongodb:latest'
+  image: 'mongo:latest'
   environment:
     - MONGODB_PASS=mypass
   ports:
     - "27017:27017"
     - "28017:28017"
 mongodbbackup:
-  image: 'tutum/mongodb-backup:latest'
+  image: 'tsangste/mongodb-backup:latest'
   links:
     - mongodb
   environment:

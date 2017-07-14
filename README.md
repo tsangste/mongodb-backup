@@ -1,6 +1,6 @@
 # mongodb-backup
 
-[![Deploy to Tutum](https://s.tutum.co/deploy-to-tutum.svg)](https://dashboard.tutum.co/stack/deploy/)
+[![Backup](https://hub.docker.com/r/tsangste/mongodb-backup/)](https://hub.docker.com/r/tsangste/mongodb-backup/)
 
 This image runs mongodump to backup data using cronjob to folder `/backup`
 
@@ -12,12 +12,12 @@ This image runs mongodump to backup data using cronjob to folder `/backup`
         --env MONGODB_USER=admin \
         --env MONGODB_PASS=password \
         --volume host.folder:/backup
-        tutum/mongodb-backup
+        tsangste/mongodb-backup
 
-Moreover, if you link `tutum/mongodb-backup` to a mongodb container(e.g. `tutum/mongodb`) with an alias named mongodb, this image will try to auto load the `host`, `port`, `user`, `pass` if possible.
+Moreover, if you link `tsangste/mongodb-backup` to a mongodb container(e.g. official mongodb mongo:latest) with an alias named mongodb, this image will try to auto load the `host`, `port`, `user`, `pass` if possible.
 
-    docker run -d -p 27017:27017 -p 28017:28017 -e MONGODB_PASS="mypass" --name mongodb tutum/mongodb
-    docker run -d --link mongodb:mongodb -v host.folder:/backup tutum/mongodb-backup
+    docker run -d -p 27017:27017 -p 28017:28017 -e MONGODB_PASS="mypass" --name mongodb mongo:latest
+    docker run -d --link mongodb:mongodb -v host.folder:/backup --name mongodb-backup tsangste/mongodb-backup
 
 ## Parameters
 
@@ -35,8 +35,8 @@ Moreover, if you link `tutum/mongodb-backup` to a mongodb container(e.g. `tutum/
 
 See the list of backups, you can run:
 
-    docker exec tutum-backup ls /backup
+    docker exec mongodb-backup ls /backup
 
 To restore database from a certain backup, simply run:
 
-    docker exec tutum-backup /restore.sh /backup/2015.08.06.171901
+    docker exec mongodb-backup /restore.sh /backup/2015.08.06.171901
