@@ -15,17 +15,33 @@ MONGODB_PASS=${MONGODB_PASS:-${MONGODB_ENV_MONGODB_PASS}}
 [[ ( -n "${MONGODB_PASS}" ) ]] && PASS_STR=" --password ${MONGODB_PASS}"
 [[ ( -n "${MONGODB_DB}" ) ]] && DB_STR=" --db ${MONGODB_DB}"
 
-BACKUP_CMD="mongodump --out /backup/"'${BACKUP_NAME}'" --host ${MONGODB_HOST} --port ${MONGODB_PORT} ${USER_STR}${PASS_STR}${DB_STR} ${EXTRA_OPTS}"
+use_gzip_backup () {
+    if [ -n "${USE_GZIP}" ]; then
+        echo ".gz --gzip"
+    else
+        echo ""
+    fi
+}
+
+use_archive_backup () {
+    if [ -n "${USE_ARCHIVE}" ]; then
+        echo "--archive="
+    else
+        echo "--out "
+    fi
+}
+
+BACKUP_CMD="mongodump $(use_archive_backup)/backup/"'${BACKUP_NAME}'"$(use_gzip_backup) --host ${MONGODB_HOST} --port ${MONGODB_PORT} ${USER_STR}${PASS_STR}${DB_STR}  ${EXTRA_OPTS}"
 
 echo "=> Creating backup script"
 rm -f /backup.sh
 cat <<EOF >> /backup.sh
 #!/bin/bash
 MAX_BACKUPS=${MAX_BACKUPS}
-BACKUP_NAME=\$(date +\%Y.\%m.\%d.\%H\%M\%S)
+BACKUP_NAME=\$(date +\%Y.\%m.\%d.\%H\%M\c%S)
 
 echo "=> Backup started"
-if ${BACKUP_CMD} ;then
+if ${BACKUP_CMD}; then
     echo "   Backup succeeded"
 else
     echo "   Backup failed"
@@ -44,6 +60,20 @@ echo "=> Backup done"
 EOF
 chmod +x /backup.sh
 
+use_gzip_restore () {
+    if [ -n "${USE_GZIP}" ]; then
+        echo "--gzip"
+    fi
+}
+
+use_archive_restore () {
+    if [ -n "${USE_ARCHIVE}" ]; then
+        echo "--archive="
+    fi
+}
+
+RESTORE_CMD="mongorestore --objcheck --host ${MONGODB_HOST} --port ${MONGODB_PORT} ${USER_STR}${PASS_STR} $(use_gzip_restore) $(use_archive_restore)"
+
 echo "=> Creating restore script"
 rm -f /restore.sh
 cat <<EOF >> /restore.sh
@@ -53,7 +83,7 @@ name="\$1"
 shift 1
 echo "=> Restore database from \$name"
 echo \$*
-if mongorestore --objcheck --host ${MONGODB_HOST} --port ${MONGODB_PORT} ${USER_STR}${PASS_STR} \$* /backup/\$name; then
+if  ${RESTORE_CMD}\$*/backup/\$name; then
     echo "   Restore succeeded"
 else
     echo "   Restore failed"

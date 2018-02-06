@@ -1,17 +1,21 @@
-mongodb:
-  image: 'mongo:latest'
-  environment:
-    - MONGODB_PASS=mypass
-  ports:
-    - "27017:27017"
-    - "28017:28017"
-mongodbbackup:
-  image: 'tsangste/mongodb-backup:latest'
-  links:
-    - mongodb
-  environment:
-    - CRON_TIME=20 3 * * * #Change to your favorate cron job schedule
-    - MAX_BACKUPS=10
-    - INIT_BACKUP=yes
-  volumes:
-    - /host/backup:/backup #Change to the host folder where you want to store the backups
+version: '3.2'
+services:
+  mongodb:
+    image: 'library/mongo:3.4'
+    environment:
+      - MONGODB_PASS=mypass
+    ports:
+      - "27017:27017"
+      - "28017:28017"
+  mongodbbackup:
+    image: 'tsangste/mongodb-backup:latest'
+    links:
+      - mongodb
+    environment:
+      - CRON_TIME=20 3 * * * #Change to your favourite cron job schedule
+      - MAX_BACKUPS=10
+      - INIT_BACKUP=yes
+      - USE_GZIP=yes
+      - USE_ARCHIVE=yes
+    volumes:
+      - /srv/backup:/backup #Change to the host folder where you want to store the backups

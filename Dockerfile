@@ -1,5 +1,5 @@
-FROM mongo:latest
-MAINTAINER Steven Tsang <tsangste@gmail.com>
+FROM library/mongo:3.4
+LABEL maintainer="Steven Tsang <tsangste@gmail.com>"
 
 RUN apt-get update && apt-get -y install cron && mkdir -p /backup
 

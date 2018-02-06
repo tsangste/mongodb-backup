@@ -30,6 +30,8 @@ Moreover, if you link `tsangste/mongodb-backup` to a mongodb container(e.g. offi
     CRON_TIME       the interval of cron job to run mongodump. `0 0 * * *` by default, which is every day at 00:00
     MAX_BACKUPS     the number of backups to keep. When reaching the limit, the old backup will be discarded. No limit, by default
     INIT_BACKUP     if set, create a backup when the container launched
+    USE_GZIP        if set, sets dump and restore to use gzip
+    USE_ARCHIVE     if set, dump and restore with a single file format and can be used with gzip
 
 ## Restore from a backup
 
@@ -39,4 +41,4 @@ See the list of backups, you can run:
 
 To restore database from a certain backup, simply run:
 
-    docker exec mongodb-backup /restore.sh /backup/2015.08.06.171901
+    docker exec mongodb-backup /restore.sh 2015.08.06.171901
